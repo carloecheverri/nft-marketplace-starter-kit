@@ -25,13 +25,15 @@ contract ERC721 {
     mapping(uint256 => address) private _tokenOwner;
     // mapping from owner to number of owned tokens
     mapping(address => uint256) private _OwnedTokensCount;
+    // mapping from token id to the owner
+    mapping(uint256 => address) private _tokenApprovals;
 
     function balanceOf(address _owner) public view returns (uint256) {
          require(_owner != address(0), 'token doesnt is non-existent');
          return _OwnedTokensCount[_owner];
     }
 
-    function ownerOf(uint256 _tokenId) external view returns (address) {
+    function ownerOf(uint256 _tokenId) public view returns (address) {
         address owner = _tokenOwner[_tokenId];
         require(owner != address(0), 'token doesnt is non-existent');
         return owner;
@@ -57,6 +59,32 @@ contract ERC721 {
             emit Tranfer(address(0), to, tokenId);
             
     }
+
+     function _transferFrom(address _from, address _to, uint256 _tokenId) internal {
+
+         require(_to != address(0), 'Error - ERC721 Transfer to the zero address');
+         require(ownerOf(_tokenId) == _from, 'Trying to tranfer a token the address does not own!' );
+
+         _OwnedTokensCount[_from] -= 1;
+         _OwnedTokensCount[_to] += 1;
+         _tokenOwner[_tokenId] = _to;
+
+         emit Tranfer(_from, _to, _tokenId);
+     }
+
+     function transferFrom(address _from, address _to, uint256 _tokenId) public { 
+         _transferFrom(_from, _to, _tokenId);
+
+     }
+
+
+    /// @notice Change or reaffirm the approved address for an NFT
+    /// @dev The zero address indicates there is no approved address.
+    ///  Throws unless `msg.sender` is the current NFT owner, or an authorized
+    ///  operator of the current owner.
+    /// @param _approved The new approved NFT controller
+    /// @param _tokenId The NFT to approve
+
     
 
 }
