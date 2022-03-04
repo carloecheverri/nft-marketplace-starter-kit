@@ -71,6 +71,7 @@ contract ERC721 {
 
          emit Tranfer(_from, _to, _tokenId);
      }
+    
 
      function transferFrom(address _from, address _to, uint256 _tokenId) public { 
          _transferFrom(_from, _to, _tokenId);
