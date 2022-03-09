@@ -22,6 +22,12 @@ contract ERC721 {
     event Tranfer(address indexed from, address indexed to, uint256 indexed tokenId); //creates a log
     // mapping in soldity creates a hash table of key pair values 
     // mapping from token id to the owner 
+    event Approval (
+        address indexed owner,
+        address indexed approved,
+        uint256 indexed tokenId
+    );
+
     mapping(uint256 => address) private _tokenOwner;
     // mapping from owner to number of owned tokens
     mapping(address => uint256) private _OwnedTokensCount;
@@ -74,8 +80,28 @@ contract ERC721 {
     
 
      function transferFrom(address _from, address _to, uint256 _tokenId) public { 
+         require(isApprovedOrOwner(msg.sender, _tokenId));
          _transferFrom(_from, _to, _tokenId);
+     }
 
+    // require that person approving is the owner
+    // approve address to a token (tokenId)
+    // require that we cant approve sending tokens of the owner to the owner (current caller)
+    // updat the map of the approval addresses 
+
+     function approve(address _to, uint256 tokenId) public {
+         address owner = ownerOf(tokenId);
+         require(_to != owner, "Error - approval to current owner");
+         require(msg.sender == owner, 'Current caller is not the owner of tokenId');
+         _tokenApprovals[tokenId] = _to;
+         emit Approval(owner, _to, tokenId);
+
+     }
+
+     function isApprovedOwner(address spender, uint256 tokenId) internal view returns(bool){
+         require(_exists(tokenId), 'token does not exist');
+         address owner = ownerOf(tokenId);
+         return(spender == owner);
      }
 
 
